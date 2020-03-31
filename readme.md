@@ -25,7 +25,7 @@ and go to a #Channel or a DM conversation
 
 I made this tool just for you ❤️ , it would be awesome if you could just click the ⭐️ Star button at the top! 
    
-If you have issues or just need help [open an issue here](https://github.com/victornpb/deleteDiscordMessages/issues)
+If you have issues or just need help [open an issue here](https://github.com/FearTM/deleteDiscordMessages/issues)
 
 
 ----
