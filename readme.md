@@ -47,7 +47,7 @@ If you have issues or just need help [open an issue here](https://github.com/vic
 
 ----
 
-Originally from https://gist.github.com/victornpb/135f5b346dea4decfc8f63ad7d9cc182
+Discord https://discord.gg/QM4kU8y
 
 ----
 
