@@ -47,10 +47,6 @@ If you have issues or just need help [open an issue here](https://github.com/vic
 
 ----
 
-Discord https://discord.gg/QM4kU8y
-
-----
-
 #### About running code on your console
 
 I don't recommend running code from random places you get on the internet. For that same reason, I deliberately choose to make it readable (that's why it is a bit lenthy). That way people can analyze it and understand what does it does before running it, and be sure that nothing sketchy is happening under the hood.
