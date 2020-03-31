@@ -1,6 +1,6 @@
 # Delete all messages in a Discord channel or DM
 
-1. Select and Copy this script: [deleteDiscordMessages.js](https://raw.githubusercontent.com/victornpb/deleteDiscordMessages/master/deleteDiscordMessages.js)
+1. Select and Copy this script: [deleteDiscordMessages.js](https://raw.githubusercontent.com/FearTM/deleteDiscordMessages/master/deleteDiscordMessages.js)
 
 2. Open [Discord](https://discordapp.com/channels/@me) in a __browser__ (like Chrome, Safari or Firefox)  
 and go to a #Channel or a DM conversation
