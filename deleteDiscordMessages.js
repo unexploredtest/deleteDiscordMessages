@@ -1,3 +1,5 @@
+// Paste this code inside discordapp.com console
+
 (function () {
     let stop;
     let popup;
