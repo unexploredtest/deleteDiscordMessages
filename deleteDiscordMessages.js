@@ -15,20 +15,20 @@
     </style></head><body>
     <div class="toolbar" style="position:fixed;top:0;left:0;right:0;padding:8px;background:#36393f;box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 1.5px 0 rgba(0,0,0,.05), 0 2px 0 rgba(0,0,0,.05);">
         <div style="display:flex;flex-wrap:wrap;">
-            <span>Authorization <a href="https://github.com/FearTM/deleteDiscordMessages/blob/master/help/authToken.md" title="Help">?</a>
+            <span>Authorization <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/authToken.md" title="Help">?</a>
                 <button id="getToken">Get</button><br>
                 <input type="password" id="authToken" placeholder="Auth Token" autofocus>*<br>
-                <span>Author <a href="https://github.com/FearTM/deleteDiscordMessages/blob/master/help/authorId.md" title="Help">?</a></span>
+                <span>Author <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/authorId.md" title="Help">?</a></span>
                 <button id="getAuthor">Me</button><br><input id="authorId" type="text" placeholder="Author ID" priv></span>
-            <span>Guild/Channel <a href="https://github.com/FearTM/deleteDiscordMessages/blob/master/help/channelId.md" title="Help">?</a>
+            <span>Guild/Channel <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/channelId.md" title="Help">?</a>
                 <button id="getGuildAndChannel">Get</button><br>
                 <input id="guildId" type="text" placeholder="Guild ID" priv><br>
                 <input id="channelId" type="text" placeholder="Channel ID" priv></span><br>
-            <span>Range <a href="https://github.com/FearTM/deleteDiscordMessages/blob/master/help/messageId.md" title="Help">?</a><br>
+            <span>Range <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/messageId.md" title="Help">?</a><br>
                 <input id="afterMessageId" type="text" placeholder="After messageId" priv><br>
                 <input id="beforeMessageId" type="text" placeholder="Before messageId" priv>
             </span>
-            <span>Filter <a href="https://github.com/FearTM/deleteDiscordMessages/blob/master/help/filters.md" title="Help">?</a><br>
+            <span>Filter <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/filters.md" title="Help">?</a><br>
                 <input id="content" type="text" placeholder="Containing text" priv><br>
                 <label><input id="hasLink" type="checkbox">has: link</label><br>
                 <label><input id="hasFile" type="checkbox">has: file</label><br>
@@ -42,8 +42,8 @@
         <label><input id="autoScroll" type="checkbox" checked><small>Auto scroll</small></label> <span></span>
     </div>
     <pre style="margin-top:150px;font-size:0.75rem;font-family:Consolas,Liberation Mono,Menlo,Courier,monospace;">
-        <center>Star this project on <a href="https://github.com/FearTM/deleteDiscordMessages" target="_blank">github.com/FearTM/deleteDiscordMessages</a>!\n\n
-            <a href="https://github.com/FearTM/deleteDiscordMessages/issues" target="_blank">Issues or help</a></center>
+        <center>Star this project on <a href="https://github.com/FearTM/deleteDiscordMessages" target="_blank">github.com/D3sktool/deleteDiscordMessages</a>!\n\n
+            <a href="https://github.com/D3sktool/deleteDiscordMessages/issues" target="_blank">Issues or help</a></center>
         </pre></body></html>`);
 
     const logArea = popup.document.querySelector('pre');
@@ -106,8 +106,8 @@
      * @param {boolean} includeNsfw Search in NSFW channels
      * @param {function(string, Array)} extLogger Function for logging
      * @param {function} stopHndl stopHndl used for stopping
-     * @author Victornpb <https://www.github.com/FearTM>
-     * @see https://github.com/FearTM/deleteDiscordMessages
+     * @author D3sktool <https://www.github.com/FearTM>
+     * @see https://github.com/D3sktool/deleteDiscordMessages
      */
     async function deleteMessages(authToken, authorId, guildId, channelId, afterMessageId, beforeMessageId, content,hasLink, hasFile, includeNsfw, extLogger, stopHndl) {
         const start = new Date();
