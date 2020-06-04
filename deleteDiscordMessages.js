@@ -1,4 +1,4 @@
-// Paste this code inside discordapp.com console
+// Paste this code inside discord.com console
 
 (function () {
     let stop;
@@ -42,7 +42,7 @@
         <label><input id="autoScroll" type="checkbox" checked><small>Auto scroll</small></label> <span></span>
     </div>
     <pre style="margin-top:150px;font-size:0.75rem;font-family:Consolas,Liberation Mono,Menlo,Courier,monospace;">
-        <center>Star this project on <a href="https://github.com/FearTM/deleteDiscordMessages" target="_blank">github.com/D3sktool/deleteDiscordMessages</a>!\n\n
+        <center>Star this project on <a href="https://github.com/victornpb/deleteDiscordMessages" target="_blank">github.com/victornpb/deleteDiscordMessages</a>!\n\n
             <a href="https://github.com/D3sktool/deleteDiscordMessages/issues" target="_blank">Issues or help</a></center>
         </pre></body></html>`);
 
@@ -106,7 +106,7 @@
      * @param {boolean} includeNsfw Search in NSFW channels
      * @param {function(string, Array)} extLogger Function for logging
      * @param {function} stopHndl stopHndl used for stopping
-     * @author D3sktool <https://www.github.com/FearTM>
+     * @author D3sktool <https://www.github.com/D3sktool>
      * @see https://github.com/D3sktool/deleteDiscordMessages
      */
     async function deleteMessages(authToken, authorId, guildId, channelId, afterMessageId, beforeMessageId, content,hasLink, hasFile, includeNsfw, extLogger, stopHndl) {
@@ -145,10 +145,10 @@
 
             let API_SEARCH_URL;
             if (guildId === '@me') {
-                API_SEARCH_URL = `https://discordapp.com/api/v6/channels/${channelId}/messages/`; // DMs
+                API_SEARCH_URL = `https://discord.com/api/v6/channels/${channelId}/messages/`; // DMs
             }
             else {
-                API_SEARCH_URL = `https://discordapp.com/api/v6/guilds/${guildId}/messages/`; // Server
+                API_SEARCH_URL = `https://discord.com/api/v6/guilds/${guildId}/messages/`; // Server
             }
 
             const headers = {
@@ -209,7 +209,7 @@
             const total = data.total_results;
             if (!grandTotal) grandTotal = total;
             const myMessages = data.messages.map(convo => convo.find(message => message.hit===true));
-            const systemMessages = myMessages.filter(msg => msg.type !== 0); // https://discordapp.com/developers/docs/resources/channel#message-object-message-types
+            const systemMessages = myMessages.filter(msg => msg.type !== 0); // https://discord.com/developers/docs/resources/channel#message-object-message-types
             const deletableMessages = myMessages.filter(msg => msg.type === 0);
             const end = () => {
                 log.success(`Ended at ${new Date().toLocaleString()}! Total time: ${msToHMS(Date.now() - start.getTime())}`);
@@ -245,8 +245,8 @@
                     let resp;
                     try {
                         const s = Date.now();
-                        const API_DELETE_URL = `https://discordapp.com/api/v6/channels/${channelId}/messages/`;
-                        resp = await fetch(API_DELETE_URL + message.id, {
+                        const API_DELETE_URL = `https://discord.com/api/v6/channels/${message.channel_id}/messages/${message.id}`;
+                        resp = await fetch(API_DELETE_URL, {
                             headers,
                             method: 'DELETE'
                         });
@@ -265,7 +265,7 @@
                             const w = (await resp.json()).retry_after;
                             throttledCount++;
                             throttledTotalTime += w;
-                            deleteDelay += w; // increase delay
+                            deleteDelay = w; // increase delay
                             log.warn(`Being rate limited by the API for ${w}ms! Adjusted delete delay to ${deleteDelay}ms.`);
                             printDelayStats();
                             log.verb(`Cooling down for ${w*2}ms before retrying...`);
