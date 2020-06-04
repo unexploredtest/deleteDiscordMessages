@@ -42,7 +42,7 @@
         <label><input id="autoScroll" type="checkbox" checked><small>Auto scroll</small></label> <span></span>
     </div>
     <pre style="margin-top:150px;font-size:0.75rem;font-family:Consolas,Liberation Mono,Menlo,Courier,monospace;">
-        <center>Star this project on <a href="https://github.com/victornpb/deleteDiscordMessages" target="_blank">github.com/D3sktool/deleteDiscordMessages</a>!\n\n
+        <center>Star this project on <a href="https://github.com/D3sktool/deleteDiscordMessages" target="_blank">github.com/D3sktool/deleteDiscordMessages</a>!\n\n
             <a href="https://github.com/D3sktool/deleteDiscordMessages/issues" target="_blank">Issues or help</a></center>
         </pre></body></html>`);
 
