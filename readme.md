@@ -6,8 +6,10 @@
 and go to a #Channel or a DM conversation
 
 3. Open DevTools pressing:
+    - Firefox (Windows, Linux, Chrome OS):
+    <kbd>F12</kbd> or <kbd>Control</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>
     - Chrome (Windows, Linux, Chrome OS):
-    <kbd>F12</kbd> or <kbd>Control</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> 
+    <kbd>F12</kbd> or <kbd>Control</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd>
     - Chrome (Mac): 
     <kbd>Command</kbd>+<kbd>Option</kbd>+<kbd>J</kbd>
     - Safari (Mac): <kbd>Command</kbd>+<kbd>Option</kbd>+<kbd>C</kbd>
@@ -44,6 +46,10 @@ If you have issues or just need help [open an issue here](https://github.com/D3s
 - You can use your computer and discord while it is running (unlike macro key scripts)
 - Start/stop whenever you want
 - Works with even thousands of messages
+
+----
+
+
 
 ----
 
