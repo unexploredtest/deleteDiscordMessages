@@ -39,11 +39,16 @@
                 <label><input id="hasFile" type="checkbox">has: file</label><br>
                 <label><input id="includePinned" type="checkbox">Include pinned</label>
             </span>
+            <span>Message to put in edits <a href="https://github.com/D3sktool/deleteDiscordMessages/blob/master/help/filters.md" title="Help">?</a><br>
+                <input id="editContent" type="text" placeholder="Containing text" priv>
+            </span>
         </div>
         <hr>
         <button id="start" style="background:#43b581;width:80px;">Start</button>
         <button id="stop" style="background:#f04747;width:80px;" disabled>Stop</button>
         <button id="clear" style="width:80px;">Clear log</button>
+        <label><input id="shouldDeleteMessages" type="checkbox" checked>Delete Messages</label>
+        <label><input id="shouldEditMessages" type="checkbox">Edit Messages</label>
         <label><input id="autoScroll" type="checkbox" checked>Auto scroll</label>
         <label title="Hide sensitive information for taking screenshots"><input id="redact" type="checkbox" checked>Screenshot mode</label>
         <progress id="progress" style="display:none;"></progress>
@@ -58,6 +63,8 @@
     const logArea = $('pre');
     const startBtn = $('button#start');
     const stopBtn = $('button#stop');
+    const shouldDeleteMessages = $('#shouldDeleteMessages');
+    const shouldEditMessages = $('#shouldEditMessages');
     const autoScroll = $('#autoScroll');
     startBtn.onclick = async e => {
         const authToken = $('input#authToken').value.trim();
@@ -73,6 +80,7 @@
         const hasFile = $('input#hasFile').checked;
         const includeNsfw = $('input#includeNsfw').checked;
         const includePinned = $('input#includePinned').checked;
+        const editContent = $('input#editContent').value.trim();
         const progress = $('#progress');
 
         const fileSelection = $("input#file");
@@ -100,7 +108,37 @@
 
         stop = stopBtn.disabled = !(startBtn.disabled = true);
         for (let i = 0; i < channelIds.length; i++) {
-            await deleteMessages(authToken, authorId, guildId, channelIds[i], minId || minDate, maxId || maxDate, content, hasLink, hasFile, includeNsfw, includePinned, logger, stopHndl, onProg);
+            if (shouldEditMessages.checked) {
+                
+                const editHeaders = {
+                    'Authorization': authToken,
+                    "Content-Type": "application/json"
+                }
+    
+                const editContentToUse = editContent || Math.random().toString(16).substr(2, 8);
+                const editRequest = {
+                    headers: editHeaders,
+                    method: 'PATCH',
+                    body: JSON.stringify({"content": editContentToUse})
+                }
+
+                await manipulateMessages(authToken, authorId, guildId, channelIds[i], minId || minDate, maxId || maxDate, content, hasLink, hasFile, includeNsfw, includePinned, logger, stopHndl, onProg, "edit", editRequest);
+            }
+
+            if (shouldDeleteMessages.checked) {
+                
+                const deleteHeaders = {
+                    'Authorization': authToken
+                }
+    
+                const deleteRequest = {
+                    headers: deleteHeaders,
+                    method: 'DELETE'
+                }
+
+                await manipulateMessages(authToken, authorId, guildId, channelIds[i], minId || minDate, maxId || maxDate, content, hasLink, hasFile, includeNsfw, includePinned, logger, stopHndl, onProg, "delete", deleteRequest);
+            }
+            
             stop = stopBtn.disabled = !(startBtn.disabled = false);
         }
     };
@@ -144,14 +182,17 @@
      * @param {boolean} includeNsfw Search in NSFW channels
      * @param {function(string, Array)} extLogger Function for logging
      * @param {function} stopHndl stopHndl used for stopping
+     * @param {function} manipulateType The type of manipulation(delele, edit, etc) to make
+     * @param {function} request The request to make
      * @author Victornpb <https://www.github.com/D3sktool>
      * @see https://github.com/D3sktool/deleteDiscordMessages
      */
-    async function deleteMessages(authToken, authorId, guildId, channelId, minId, maxId, content,hasLink, hasFile, includeNsfw, includePinned, extLogger, stopHndl, onProgress) {
+
+    async function manipulateMessages(authToken, authorId, guildId, channelId, minId, maxId, content,hasLink, hasFile, includeNsfw, includePinned, extLogger, stopHndl, onProgress, manipulateType, request) {
         const start = new Date();
-        let deleteDelay = 100;
+        let manipulateDelay = 100;
         let searchDelay = 100;
-        let delCount = 0;
+        let manipulateCount = 0;
         let failCount = 0;
         let avgPing;
         let lastPing;
@@ -167,7 +208,7 @@
         const redact = str => `<span class="priv">${escapeHTML(str)}</span><span class="mask">REDACTED</span>`;
         const queryString = params => params.filter(p => p[1] !== undefined).map(p => p[0] + '=' + encodeURIComponent(p[1])).join('&');
         const ask = async msg => new Promise(resolve => setTimeout(() => resolve(popup.confirm(msg)), 10));
-        const printDelayStats = () => log.verb(`Delete delay: ${deleteDelay}ms, Search delay: ${searchDelay}ms`, `Last Ping: ${lastPing}ms, Average Ping: ${avgPing|0}ms`);
+        const printDelayStats = () => log.verb(`${manipulateType} delay: ${manipulateDelay}ms, Search delay: ${searchDelay}ms`, `Last Ping: ${lastPing}ms, Average Ping: ${avgPing|0}ms`);
         const toSnowflake = (date) => /:/.test(date) ? ((new Date(date).getTime() - 1420070400000) * Math.pow(2, 22)) : date;
             
         const log = {
@@ -188,7 +229,7 @@
                 API_SEARCH_URL = `https://discord.com/api/v6/guilds/${guildId}/messages/`; // Server
             }
 
-            const headers = {
+            const searchHeaders = {
                 'Authorization': authToken
             };
             
@@ -207,7 +248,7 @@
                     [ 'has', hasFile ? 'file' : undefined ],
                     [ 'content', content || undefined ],
                     [ 'include_nsfw', includeNsfw ? true : undefined ],
-                ]), { headers });
+                ]), { headers: searchHeaders });
                 lastPing = (Date.now() - s);
                 avgPing = avgPing>0 ? (avgPing*0.9) + (lastPing*0.1) : lastPing;
             } catch (err) {
@@ -246,68 +287,65 @@
             const total = data.total_results;
             if (!grandTotal) grandTotal = total;
             const discoveredMessages = data.messages.map(convo => convo.find(message => message.hit===true));
-            const messagesToDelete = discoveredMessages.filter(msg => {
+            const messagesToManipulate = discoveredMessages.filter(msg => {
                 return msg.type === 0 || msg.type === 6 || (msg.pinned && includePinned);
             });
-            const skippedMessages = discoveredMessages.filter(msg=>!messagesToDelete.find(m=> m.id===msg.id));
+            const skippedMessages = discoveredMessages.filter(msg=>!messagesToManipulate.find(m=> m.id===msg.id));
 
             const end = () => {
                 log.success(`Ended at ${new Date().toLocaleString()}! Total time: ${msToHMS(Date.now() - start.getTime())}`);
                 printDelayStats();
                 log.verb(`Rate Limited: ${throttledCount} times. Total time throttled: ${msToHMS(throttledTotalTime)}.`);
-                log.debug(`Deleted ${delCount} messages, ${failCount} failed.\n`);
+                log.debug(`${manipulateType}ed ${manipulateCount} messages, ${failCount} failed.\n`);
             }
 
-            const etr = msToHMS((searchDelay * Math.round(total / 25)) + ((deleteDelay + avgPing) * total));
-            log.info(`Total messages found: ${data.total_results}`, `(Messages in current page: ${data.messages.length}, To be deleted: ${messagesToDelete.length}, System: ${skippedMessages.length})`, `offset: ${offset}`);
+            const etr = msToHMS((searchDelay * Math.round(total / 25)) + ((manipulateDelay + avgPing) * total));
+            log.info(`Total messages found: ${data.total_results}`, `(Messages in current page: ${data.messages.length}, To be ${manipulateType}ed: ${messagesToManipulate.length}, System: ${skippedMessages.length})`, `offset: ${offset}`);
             printDelayStats();
             log.verb(`Estimated time remaining: ${etr}`)
             
             
-            if (messagesToDelete.length > 0) {
+            if (grandTotal > manipulateCount) {
 
                 if (++iterations < 1) {
                     log.verb(`Waiting for your confirmation...`);
-                    if (!await ask(`Do you want to delete ~${total} messages?\nEstimated time: ${etr}\n\n---- Preview ----\n` +
-                        messagesToDelete.map(m => `${m.author.username}#${m.author.discriminator}: ${m.attachments.length ? '[ATTACHMENTS]' : m.content}`).join('\n')))
+                    if (!await ask(`Do you want to ${manipulateType} ~${total} messages?\nEstimated time: ${etr}\n\n---- Preview ----\n` +
+                    messagesToManipulate.map(m => `${m.author.username}#${m.author.discriminator}: ${m.attachments.length ? '[ATTACHMENTS]' : m.content}`).join('\n')))
                             return end(log.error('Aborted by you!'));
                     log.verb(`OK`);
                 }
                 
-                for (let i = 0; i < messagesToDelete.length; i++) {
-                    const message = messagesToDelete[i];
+                for (let i = 0; i < messagesToManipulate.length; i++) {
+                    const message = messagesToManipulate[i];
                     if (stopHndl && stopHndl()===false) return end(log.error('Stopped by you!'));
 
-                    log.debug(`${((delCount + 1) / grandTotal * 100).toFixed(2)}% (${delCount + 1}/${grandTotal})`,
-                        `Deleting ID:${redact(message.id)} <b>${redact(message.author.username+'#'+message.author.discriminator)} <small>(${redact(new Date(message.timestamp).toLocaleString())})</small>:</b> <i>${redact(message.content).replace(/\n/g,'↵')}</i>`,
+                    log.debug(`${((manipulateCount + 1) / grandTotal * 100).toFixed(2)}% (${manipulateCount + 1}/${grandTotal})`,
+                        `${manipulateType} ID:${redact(message.id)} <b>${redact(message.author.username+'#'+message.author.discriminator)} <small>(${redact(new Date(message.timestamp).toLocaleString())})</small>:</b> <i>${redact(message.content).replace(/\n/g,'↵')}</i>`,
                         message.attachments.length ? redact(JSON.stringify(message.attachments)) : '');
-                    if (onProgress) onProgress(delCount + 1, grandTotal);
+                    if (onProgress) onProgress(manipulateCount + 1, grandTotal);
                     
                     let resp;
                     try {
                         const s = Date.now();
-                        const API_DELETE_URL = `https://discord.com/api/v6/channels/${message.channel_id}/messages/${message.id}`;
-                        resp = await fetch(API_DELETE_URL, {
-                            headers,
-                            method: 'DELETE'
-                        });
+                        const API_URL = `https://discord.com/api/v6/channels/${message.channel_id}/messages/${message.id}`;
+                        resp = await fetch(API_URL, request);
                         lastPing = (Date.now() - s);
                         avgPing = (avgPing*0.9) + (lastPing*0.1);
-                        delCount++;
+                        manipulateCount++;
                     } catch (err) {
-                        log.error('Delete request throwed an error:', err);
+                        log.error('Patch request throwed an error:', err);
                         log.verb('Related object:', redact(JSON.stringify(message)));
                         failCount++;
                     }
 
                     if (!resp.ok) {
-                        // deleting messages too fast
+                        // manipulating messages too fast
                         if (resp.status === 429) {
                             const w = (await resp.json()).retry_after;
                             throttledCount++;
                             throttledTotalTime += w;
-                            deleteDelay = w; // increase delay
-                            log.warn(`Being rate limited by the API for ${w}ms! Adjusted delete delay to ${deleteDelay}ms.`);
+                            manipulateDelay = w; // increase delay
+                            log.warn(`Being rate limited by the API for ${w}ms! Adjusted ${manipulateType} delay to ${manipulateDelay}ms.`);
                             printDelayStats();
                             log.verb(`Cooling down for ${w*2}ms before retrying...`);
                             await wait(w*2);
@@ -319,15 +357,15 @@
                         }
                     }
                     
-                    await wait(deleteDelay);
+                    await wait(manipulateDelay);
                 }
-
+                
                 if (skippedMessages.length > 0) {
                     grandTotal -= skippedMessages.length;
                     offset += skippedMessages.length;
                     log.verb(`Found ${skippedMessages.length} system messages! Decreasing grandTotal to ${grandTotal} and increasing offset to ${offset}.`);
                 }
-                
+
                 log.verb(`Searching next messages in ${searchDelay}ms...`, (offset ? `(offset: ${offset})` : '') );
                 await wait(searchDelay);
 
@@ -346,5 +384,4 @@
         return await recurse();
     }
 })();
-
 //END.
